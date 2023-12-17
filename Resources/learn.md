@@ -31,7 +31,7 @@ while (true){
 
 ## Instalation for Windows ##
 ### Vscode Installation ###
-First for any modification you want to do you need, or you want to be inspired from this project you nned first a [VScode](https://code.visualstudio.com/download).
+First for any modification you want to do you need, or you want to be inspired from this project you need first a [VScode](https://code.visualstudio.com/download).
 ### C compiler Installation ###
 To use the GNU Compiler Collection (GCC) on Windows, you can use the MinGW-w64 distribution. Follow these steps:
 
@@ -71,7 +71,7 @@ int main(){
     ...
 }
 ```
-**Note :** you nned to add this file in your project :
+**Note :** you need to add this file in your project :
 ```
 - Project Dir
   | - main.c
@@ -84,11 +84,11 @@ int main(){
 
 And try :
 ```bash
-gcc main.c -o ExeName
+gcc main.c -o myprogram
 ```
 or
 ```bash
-gcc main.c library.c -o ExeName
+gcc main.c library.c -o myprogram
 ```
 To run it do :
 ```bash
