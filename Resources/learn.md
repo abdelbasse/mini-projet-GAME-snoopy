@@ -15,7 +15,7 @@ void Drow(){
 }
 ```
 
-### What exaclty happening is ###
+### What happen in the Main ###
  - the [Update] function is a function that loop every frame and every frame it have a render the and read user data.
  - for [Setup] is just a simple function before the loop start to set up some data or function needed after.
 
@@ -28,3 +28,6 @@ while (true){
     drow();
 }
 ```
+
+## Instalation for Windows ##
+First for any modification u want to do u need, or u want to be inspired from this project u nned first a [VScode](#https://code.visualstudio.com/download)
