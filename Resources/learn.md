@@ -1,5 +1,6 @@
 # CDL my documentation #
-## Learning API ##
+## Introduction ##
+# Learning how Game Engin works #
 each game engin have 3 main function , **Setup** , **Update** , **Drow**
 in engines the code will look like this 
 ```c
@@ -14,9 +15,10 @@ void Drow(){
 }
 ```
 
-## Simple traduction ##
+# What exaclty happening is #
  - the [Update] function is a function that loop every frame and every frame it have a render the and read user data.
  - for [Setup] is just a simple function before the loop start to set up some data or function needed after.
+
 ```c
 Setup();
 while (true){
