@@ -88,12 +88,14 @@ gcc main.c -o ExeName
 ```
 or
 ```bash
-gcc main.c library.c -o myprogram
+gcc main.c library.c -o ExeName
 ```
 To run it do :
 ```bash
 ./myprogram
 ```
+
+For information about this library [Click me](https://wiki.libsdl.org/SDL2/FrontPage)
 
 
 
