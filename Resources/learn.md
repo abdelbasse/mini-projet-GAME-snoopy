@@ -30,4 +30,17 @@ while (true){
 ```
 
 ## Instalation for Windows ##
-First for any modification u want to do u need, or u want to be inspired from this project u nned first a [VScode](https://code.visualstudio.com/download)
+### Vscode Installation ###
+First for any modification you want to do you need, or you want to be inspired from this project you nned first a [VScode](https://code.visualstudio.com/download).
+### SDL Installation ###
+You need to Visit the Official website of [SDL](https://www.libsdl.org/) , then. and go to Downsload option.
+if they still using github . then select [SDL2-devel-2.28.5-VC.zip](https://github.com/libsdl-org/SDL/releases/tag/release-2.28.5) you might still find it in the link.(*Only For C Programming*)
+
+Now, u only need some file inside [include] directory,which are :
+- SDL2.dll
+- SDL2.lib
+- SDL2main.dll
+- SDL.h
+
+
+
