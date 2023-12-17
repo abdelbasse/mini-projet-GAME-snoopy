@@ -61,7 +61,7 @@ Now, you only need to use some files inside **./include** directory,which are :
 - SDL2main.dll
 - SDL.h
 
-After that u need to include it in your progamme : 
+After that you need to include it in your progamme : 
 ```c
 #include <stdlib.h>
 #include <stdin.h>
@@ -80,6 +80,19 @@ int main(){
   | - SDL2main.dll
   | - SDL.h
 
+```
+
+And try :
+```bash
+gcc main.c -o ExeName
+```
+or
+```bash
+gcc main.c library.c -o myprogram
+```
+To run it do :
+```bash
+./myprogram
 ```
 
 
