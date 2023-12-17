@@ -30,4 +30,4 @@ while (true){
 ```
 
 ## Instalation for Windows ##
-First for any modification u want to do u need, or u want to be inspired from this project u nned first a [VScode](#https://code.visualstudio.com/download)
+First for any modification u want to do u need, or u want to be inspired from this project u nned first a [VScode](https://code.visualstudio.com/download)
