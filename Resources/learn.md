@@ -31,9 +31,9 @@ while (true){
 
 ## Instalation for Windows ##
 ### Vscode Installation ###
-    First for any modification you want to do you need, or you want to be inspired from this project you need first a [VScode](https://code.visualstudio.com/download).
+First for any modification you want to do you need, or you want to be inspired from this project you need first a [VScode](https://code.visualstudio.com/download).
 ### C compiler Installation ###
-    To use the GNU Compiler Collection (GCC) on Windows, you can use the MinGW-w64 distribution. Follow these steps:
+To use the GNU Compiler Collection (GCC) on Windows, you can use the MinGW-w64 distribution. Follow these steps:
 
 1. **Download MinGW-w64 Installer:**
    - Visit the [MinGW-w64 download page](https://mingw-w64.org/doku.php) and download the installer appropriate for your system (32-bit or 64-bit).
@@ -52,48 +52,48 @@ Now, you have GCC installed on your Windows system and can use it to compile C a
 
 For more detailed instructions or troubleshooting, refer to the [MinGW-w64 documentation](https://mingw-w64.org/doku.php).
 ### SDL Installation ###
-    You need to Visit the Official website of [SDL](https://www.libsdl.org/) , then. and go to Downsload option.
-    if they still using github . then select [SDL2-devel-2.28.5-VC.zip](https://github.com/libsdl-org/SDL/releases/tag/release-2.28.5) you might still find it in the link.(*Only For C Programming*)
+You need to Visit the Official website of [SDL](https://www.libsdl.org/) , then. and go to Downsload option.
+if they still using github . then select [SDL2-devel-2.28.5-VC.zip](https://github.com/libsdl-org/SDL/releases/tag/release-2.28.5) you might still find it in the link.(*Only For C Programming*)
 
-    Now, you only need to use some files inside **./include** directory,which are :
-     - SDL2.dll
-     - SDL2.lib
-     - SDL2main.dll
-     - SDL.h
+Now, you only need to use some files inside **./include** directory,which are :
+- SDL2.dll
+- SDL2.lib
+- SDL2main.dll
+- SDL.h
 
-    After that you need to include it in your progamme : 
-    ```c
-    #include <stdlib.h>
-    #include <stdin.h>
-    #include "SDL.h"
+After that you need to include it in your progamme : 
+```c
+#include <stdlib.h>
+#include <stdin.h>
+#include "SDL.h"
 
-    int main(){
-        ...
-    }
-    ```
+int main(){
+    ...
+}
+```
 **Note :** you need to add this file in your project :
-    ```
-    - Project Dir
-    | - main.c
-    | - SDL2.dll
-    | - SDL2.lib
-    | - SDL2main.dll
-    | - SDL.h
+```
+- Project Dir
+  | - main.c
+  | - SDL2.dll
+  | - SDL2.lib
+  | - SDL2main.dll
+  | - SDL.h
 
-    ```
+```
 
 And try :
-    ```bash
-    gcc main.c -o myprogram
-    ```
-    **or**
-    ```bash
-    gcc main.c library.c -o myprogram
-    ```
+```bash
+gcc main.c -o myprogram
+```
+or
+```bash
+gcc main.c library.c -o myprogram
+```
 To run it do :
-    ```bash
-    ./myprogram
-    ```
+```bash
+./myprogram
+```
 
 For information about this library [Click me](https://wiki.libsdl.org/SDL2/FrontPage)
 
