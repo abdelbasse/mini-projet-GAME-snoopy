@@ -1,5 +1,3 @@
-### SDL my documentation ###
-This is a line  
-break.
-## Learning API ##
+## CDL my documentation ##
+# Learning API #
 
