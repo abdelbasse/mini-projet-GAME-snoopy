@@ -4,14 +4,14 @@
 
 typedef struct
 {
-    int x,y;
-}Position;
-
+    int x, y;
+} Position;
 
 typedef struct
 {
     Position pos;
     int lives;
+    int lastDirection;
 } Player;
 
 typedef struct
@@ -23,19 +23,26 @@ typedef struct
 
 typedef struct
 {
-   Position *pos; 
-}Blocks;
-
+    Position *pos;
+    int nbr;
+} BlockPositions;
 
 // Public variables to make acces more easier
 int box = 48, HIEGHT = 9, WIDTH = 10;
 bool playing = true;
+int Frame = 15;
+// int timerColor = {52, 98, 88};
+
 SDL_Window *window;
 SDL_Renderer *render;
-int Frame = 15;
 Player Snoppy;
 Timer GameTimer;
+BlockPositions blockMap;
+
 int totaleTime;
+
+// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 // Main Function
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -51,6 +58,8 @@ void makeTimer();
 
 void makeGread();
 
+void RenderMap();
+
 void GameTimeClock();
 
 void SetUp()
@@ -65,7 +74,17 @@ void SetUp()
     // set timer for decresing
     totaleTime = GameTimer.time * 500;
 
-    //Tmp Position of Grides
+    // Tmp Position of Grides
+    blockMap.pos = (Position *)calloc(4, sizeof(Position));
+    blockMap.nbr = 4;
+    blockMap.pos[0].x = 0;
+    blockMap.pos[0].y = 0;
+    blockMap.pos[1].x = 8;
+    blockMap.pos[1].y = 3;
+    blockMap.pos[2].x = 3;
+    blockMap.pos[2].y = 7;
+    blockMap.pos[3].x = 6;
+    blockMap.pos[3].y = 3;
 }
 
 void RenderGame()
@@ -133,6 +152,7 @@ void makeGread()
         }
     }
     makeTimer();
+    RenderMap();
 }
 
 void makeTimer()
@@ -235,6 +255,46 @@ void GameTimeClock()
     {
         totaleTime -= Frame;
     }
+}
+
+// Render the box depending on the index x,y (0 to 8 for X ----- 0 to 7 for Y)
+void RenderMap()
+{
+    for (int i = 0; i < blockMap.nbr; i++)
+    {
+        SDL_Surface *surface = SDL_LoadBMP("../src/block.bmp");
+        if (!surface)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load BMP image: %s", SDL_GetError());
+            EndGame();
+            return;
+        }
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(render, surface);
+        SDL_FreeSurface(surface);
+        if (!texture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to create texture from surface: %s", SDL_GetError());
+            EndGame();
+            return;
+        }
+        SDL_Rect destinationRect = {(blockMap.pos[i].x * box) + box / 2, (blockMap.pos[i].y * box) + box / 2, box, box};
+        SDL_RenderCopy(render, texture, NULL, &destinationRect);
+    }
+}
+
+Position GetPlayerPosition()
+{
+    Position var;
+    var.x = Snoppy.pos.x * box + (box / 2);
+    var.y = Snoppy.pos.y * box + (box / 2);
+    return var;
+}
+// function that take the curent index of player and add the nextX & nextY
+void SetPlayerPositionTo(int nextX, int nectY)
+{
+    // Code that chnage the icon of player depeding on the direction using(.lastDirection in  structer)
+    //
+    //  code Chnage the x and y
 }
 
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
