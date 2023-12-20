@@ -31,7 +31,8 @@ typedef struct
 int box = 48, HIEGHT = 9, WIDTH = 10;
 bool playing = true;
 int Frame = 15;
-// int timerColor = {52, 98, 88};
+int timerColor[3][3] = {{223, 243, 208}, {255, 246, 90}, {255, 97, 61}};
+int indexTimerColor = 0;
 
 SDL_Window *window;
 SDL_Renderer *render;
@@ -69,7 +70,7 @@ void SetUp()
     GameTimer.h = HIEGHT - 1;
     GameTimer.Totale = (GameTimer.w * 2 + GameTimer.h * 2) * 2 - 1;
     GameTimer.dec = 1;
-    GameTimer.time = 1;
+    GameTimer.time = 0.3;
 
     // set timer for decresing
     totaleTime = GameTimer.time * 500;
@@ -77,7 +78,7 @@ void SetUp()
     // Tmp Position of Grides
     blockMap.pos = (Position *)calloc(4, sizeof(Position));
     blockMap.nbr = 4;
-    blockMap.pos[0].x = 0;
+    blockMap.pos[0].x = 1;
     blockMap.pos[0].y = 0;
     blockMap.pos[1].x = 8;
     blockMap.pos[1].y = 3;
@@ -171,11 +172,19 @@ void makeTimer()
         SDL_RenderFillRect(render, &topRect);
     }
     int totaleLeft = GameTimer.Totale - 3;
+    if (totaleLeft < ((2 * 64) / 3))
+    {
+        indexTimerColor = 1;
+    }
+    if (totaleLeft < (64 / 3))
+    {
+        indexTimerColor = 2;
+    }
     for (int i = 6; i >= 0; i--)
     {
         if (totaleLeft > 0)
         {
-            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
+            SDL_SetRenderDrawColor(render, timerColor[indexTimerColor][0], timerColor[indexTimerColor][1], timerColor[indexTimerColor][2], 255); // Dark gray color
         }
         else
         {
@@ -193,7 +202,7 @@ void makeTimer()
         }
         else
         {
-            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
+            SDL_SetRenderDrawColor(render, timerColor[indexTimerColor][0], timerColor[indexTimerColor][1], timerColor[indexTimerColor][2], 255); // Dark gray color
         }
         SDL_Rect topRect = {0 + (box / 16), ((i * (box / 2)) + box / 2) + (box / 12), box / 2 - box / 6, box / 2 - box / 6};
         SDL_RenderFillRect(render, &topRect);
@@ -203,7 +212,7 @@ void makeTimer()
     {
         if (totaleLeft > 0)
         {
-            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
+            SDL_SetRenderDrawColor(render, timerColor[indexTimerColor][0], timerColor[indexTimerColor][1], timerColor[indexTimerColor][2], 255); // Dark gray color
         }
         else
         {
@@ -217,7 +226,7 @@ void makeTimer()
     {
         if (totaleLeft > 0)
         {
-            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
+            SDL_SetRenderDrawColor(render, timerColor[indexTimerColor][0], timerColor[indexTimerColor][1], timerColor[indexTimerColor][2], 255); // Dark gray color
         }
         else
         {
@@ -231,7 +240,7 @@ void makeTimer()
     {
         if (totaleLeft > 0)
         {
-            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
+            SDL_SetRenderDrawColor(render, timerColor[indexTimerColor][0], timerColor[indexTimerColor][1], timerColor[indexTimerColor][2], 255); // Dark gray color
         }
         else
         {
@@ -295,6 +304,7 @@ void SetPlayerPositionTo(int nextX, int nectY)
     // Code that chnage the icon of player depeding on the direction using(.lastDirection in  structer)
     //
     //  code Chnage the x and y
+    Snoppy;
 }
 
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
