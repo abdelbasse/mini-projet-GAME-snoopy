@@ -33,6 +33,8 @@ void EndGame()
     SDL_Quit();
 }
 
+void makeTimer();
+
 void makeGread();
 
 void RenderGame()
@@ -98,10 +100,36 @@ void makeGread()
             SDL_RenderFillRect(render, &topRect);
         }
     }
+    makeTimer();
 }
 
 void makeTimer()
 {
+    for (int i = 0; i < 2; i++)
+    {
+        if (i < GameTimer.dec)
+        {
+            SDL_SetRenderDrawColor(render, 40, 40, 40, 255); // Dark gray color
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(render, 200, 200, 200, 255); // Light gray color
+        }
+        SDL_Rect topRect = {(i * box) + box * 4, 0, box, box / 2};
+        SDL_RenderFillRect(render, &topRect);
+    }
+    int totaleLeft = GameTimer.Totale;
+    for (int i = 3; i < 0; i++)
+    {
+        if (i < GameTimer.dec)
+        {
+            SDL_SetRenderDrawColor(render, 0, 0, 0, 255); // Dark gray color
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(render, 230, 230, 230, 255); // Light gray color
+        }
+    }
 }
 
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
