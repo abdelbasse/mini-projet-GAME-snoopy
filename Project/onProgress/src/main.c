@@ -45,6 +45,9 @@ int totaleTime;
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+Position GetPlayerPosition();
+void SetPlayerPositionTo(int, int);
+
 // Main Function
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 void EndGame()
@@ -63,6 +66,8 @@ void RenderMap();
 
 void GameTimeClock();
 
+void drowPlayer();
+
 void SetUp()
 {
     // set class of the timer game
@@ -70,7 +75,7 @@ void SetUp()
     GameTimer.h = HIEGHT - 1;
     GameTimer.Totale = (GameTimer.w * 2 + GameTimer.h * 2) * 2 - 4;
     GameTimer.dec = 1;
-    GameTimer.time = 0.4;
+    GameTimer.time = 0.3;
 
     // set timer for decresing
     totaleTime = GameTimer.time * 500;
@@ -99,6 +104,7 @@ void RenderGame()
 void Update()
 {
     GameTimeClock();
+    SetPlayerPositionTo(2, 6);
 }
 
 void HandelEvents()
@@ -154,6 +160,15 @@ void makeGread()
     }
     makeTimer();
     RenderMap();
+    drowPlayer();
+}
+
+void drowPlayer()
+{
+    SDL_SetRenderDrawColor(render, 255, 0, 255, 255); // White color
+    SDL_Rect topRect = {Snoppy.pos.x, Snoppy.pos.y, box, box};
+    SDL_RenderFillRect(render, &topRect);
+    printf("\nhello Player position is : ( x: %d , y: %d ) Real data is   ( x: %d , y: %d )", GetPlayerPosition().x, GetPlayerPosition().y, Snoppy.pos.x, Snoppy.pos.y);
 }
 
 void makeTimer()
@@ -293,8 +308,8 @@ void RenderMap()
 Position GetPlayerPosition()
 {
     Position var;
-    var.x = (int)Snoppy.pos.x / (box + (box / 2));
-    var.y = (int)Snoppy.pos.y / (box + (box / 2));
+    var.x = (int)(Snoppy.pos.x - 24) / (box);
+    var.y = (int)(Snoppy.pos.y - 24) / (box);
     return var;
 }
 // function that take the curent index of player and add the nextX & nextY
@@ -303,16 +318,18 @@ void SetPlayerPositionTo(int nextX, int nextY)
     // Code that chnage the icon of player depeding on the direction using(.lastDirection in  structer)
     //
     //  code Chnage the x and y
-    if (nextX >= 0 && nextX < WIDTH && nextY >= 0 && nextY < HIEGHT){
+    if (nextX >= 0 && nextX < WIDTH && nextY >= 0 && nextY < HIEGHT)
+    {
         Snoppy.pos.x = nextX * box + (box / 2);
         Snoppy.pos.y = nextY * box + (box / 2);
-    }else{
+    }
+    else
+    {
         printf("Can't do a position out of the matrics");
     }
 }
 
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
 int main(int argc, char **argv)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -340,6 +357,7 @@ int main(int argc, char **argv)
 
     // Game Loop
     //  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
     while (playing)
     {
         HandelEvents();
