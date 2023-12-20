@@ -70,7 +70,7 @@ void SetUp()
     GameTimer.h = HIEGHT - 1;
     GameTimer.Totale = (GameTimer.w * 2 + GameTimer.h * 2) * 2 - 4;
     GameTimer.dec = 1;
-    GameTimer.time = 1;
+    GameTimer.time = 0.4;
 
     // set timer for decresing
     totaleTime = GameTimer.time * 500;
@@ -158,7 +158,6 @@ void makeGread()
 
 void makeTimer()
 {
-    SDL_RenderClear(render);
     for (int i = 1; i >= 0; i--)
     {
         if (i >= GameTimer.dec)
@@ -172,8 +171,7 @@ void makeTimer()
         SDL_Rect topRect = {(i * box) + box * 4, 0, box, box / 2};
         SDL_RenderFillRect(render, &topRect);
     }
-    int totaleLeft = GameTimer.Totale - 4;
-    printf("\n\t===> tail : %d", GameTimer.Totale);
+    int totaleLeft = GameTimer.Totale;
     if (totaleLeft < ((2 * 64) / 3))
     {
         indexTimerColor = 1;
@@ -198,13 +196,13 @@ void makeTimer()
     }
     for (int i = 0; i < GameTimer.h * 2; i++)
     {
-        if (totaleLeft < 0)
+        if (totaleLeft > 0)
         {
-            SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
+            SDL_SetRenderDrawColor(render, timerColor[indexTimerColor][0], timerColor[indexTimerColor][1], timerColor[indexTimerColor][2], 255); // Dark gray color
         }
         else
         {
-            SDL_SetRenderDrawColor(render, timerColor[indexTimerColor][0], timerColor[indexTimerColor][1], timerColor[indexTimerColor][2], 255); // Dark gray color
+            SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
         }
         SDL_Rect topRect = {0 + (box / 16), ((i * (box / 2)) + box / 2) + (box / 12), box / 2 - box / 6, box / 2 - box / 6};
         SDL_RenderFillRect(render, &topRect);
@@ -256,7 +254,6 @@ void makeTimer()
 
 void GameTimeClock()
 {
-    printf("\n\n ==> %d", totaleTime);
     if (totaleTime < 0)
     {
         GameTimer.Totale -= GameTimer.dec;
@@ -296,17 +293,22 @@ void RenderMap()
 Position GetPlayerPosition()
 {
     Position var;
-    var.x = Snoppy.pos.x * box + (box / 2);
-    var.y = Snoppy.pos.y * box + (box / 2);
+    var.x = (int)Snoppy.pos.x / (box + (box / 2));
+    var.y = (int)Snoppy.pos.y / (box + (box / 2));
     return var;
 }
 // function that take the curent index of player and add the nextX & nextY
-void SetPlayerPositionTo(int nextX, int nectY)
+void SetPlayerPositionTo(int nextX, int nextY)
 {
     // Code that chnage the icon of player depeding on the direction using(.lastDirection in  structer)
     //
     //  code Chnage the x and y
-    Snoppy;
+    if (nextX >= 0 && nextX < WIDTH && nextY >= 0 && nextY < HIEGHT){
+        Snoppy.pos.x = nextX * box + (box / 2);
+        Snoppy.pos.y = nextY * box + (box / 2);
+    }else{
+        printf("Can't do a position out of the matrics");
+    }
 }
 
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
