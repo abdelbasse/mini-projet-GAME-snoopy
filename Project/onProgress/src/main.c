@@ -24,6 +24,7 @@ Player Snoppy;
 Timer GameTimer;
 
 // Main Function
+// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 void EndGame()
 {
     SDL_RenderClear(render);
@@ -31,6 +32,8 @@ void EndGame()
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
+
+void makeGread();
 
 void RenderGame()
 {
@@ -61,10 +64,13 @@ void HandelEvents()
         }
     }
 }
+// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 // Game Extra function
+// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 void makeGread()
 {
+    SDL_RenderClear(render);
     SDL_Surface *surface = SDL_LoadBMP("../src/sonic.bmp");
     if (!surface)
     {
@@ -80,20 +86,31 @@ void makeGread()
         EndGame();
         return;
     }
-
-    SDL_Rect destinationRect = {box / 2, box / 2, box * 8, box * 8};
+    SDL_Rect destinationRect = {box / 2, box / 2, box * 9, box * 9};
     SDL_RenderCopy(render, texture, NULL, &destinationRect);
+
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            SDL_SetRenderDrawColor(render, 255, 255, 255, 255); // White color
+            SDL_Rect topRect = {(i * (box * 10 - (box / 2))),(j * (box * 10 - (box / 2))) , box / 2, box / 2};
+            SDL_RenderFillRect(render, &topRect);
+        }
+    }
 }
 
-void makeGameTimer()
-{
+void makeTimer(){
+    
 }
+
+// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 int main(int argc, char **argv)
 {
     // Set UP
     // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    WIDTH = box * 9;
+    WIDTH = box * 10;
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
         fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
@@ -116,10 +133,8 @@ int main(int argc, char **argv)
     }
     // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-
-
-    //Game Loop
-    // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    // Game Loop
+    //  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     while (playing)
     {
         HandelEvents();
