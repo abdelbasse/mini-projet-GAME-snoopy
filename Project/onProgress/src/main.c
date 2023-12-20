@@ -4,8 +4,13 @@
 
 typedef struct
 {
-    int w, h;
-    float x, y;
+    int x,y;
+}Position;
+
+
+typedef struct
+{
+    Position pos;
     int lives;
 } Player;
 
@@ -13,15 +18,24 @@ typedef struct
 {
     int Totale, dec;
     int h, w;
+    float time;
 } Timer;
+
+typedef struct
+{
+   Position *pos; 
+}Blocks;
+
 
 // Public variables to make acces more easier
 int box = 48, HIEGHT = 9, WIDTH = 10;
 bool playing = true;
 SDL_Window *window;
 SDL_Renderer *render;
+int Frame = 15;
 Player Snoppy;
 Timer GameTimer;
+int totaleTime;
 
 // Main Function
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -37,16 +51,34 @@ void makeTimer();
 
 void makeGread();
 
+void GameTimeClock();
+
+void SetUp()
+{
+    // set class of the timer game
+    GameTimer.w = WIDTH - 1;
+    GameTimer.h = HIEGHT - 1;
+    GameTimer.Totale = (GameTimer.w * 2 + GameTimer.h * 2) * 2 - 1;
+    GameTimer.dec = 1;
+    GameTimer.time = 1;
+
+    // set timer for decresing
+    totaleTime = GameTimer.time * 500;
+
+    //Tmp Position of Grides
+}
+
 void RenderGame()
 {
     SDL_RenderClear(render);
-    SDL_SetRenderDrawColor(render, 20, 20, 20, 255);
+    SDL_SetRenderDrawColor(render, 0, 23, 27, 255);
     makeGread();
     SDL_RenderPresent(render);
 }
 
 void Update()
 {
+    GameTimeClock();
 }
 
 void HandelEvents()
@@ -105,9 +137,9 @@ void makeGread()
 
 void makeTimer()
 {
-    for (int i = 0; i < 2; i++)
+    for (int i = 1; i >= 0; i--)
     {
-        if (i < GameTimer.dec)
+        if (i >= GameTimer.dec)
         {
             SDL_SetRenderDrawColor(render, 40, 40, 40, 255); // Dark gray color
         }
@@ -118,17 +150,90 @@ void makeTimer()
         SDL_Rect topRect = {(i * box) + box * 4, 0, box, box / 2};
         SDL_RenderFillRect(render, &topRect);
     }
-    int totaleLeft = GameTimer.Totale;
-    for (int i = 3; i < 0; i++)
+    int totaleLeft = GameTimer.Totale - 3;
+    for (int i = 6; i >= 0; i--)
     {
-        if (i < GameTimer.dec)
+        if (totaleLeft > 0)
         {
-            SDL_SetRenderDrawColor(render, 0, 0, 0, 255); // Dark gray color
+            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
         }
         else
         {
-            SDL_SetRenderDrawColor(render, 230, 230, 230, 255); // Light gray color
+            SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
         }
+        SDL_Rect topRect = {((i * (box / 2)) + box / 2) + (box / 12), 0 + (box / 16), box / 2 - box / 6, box / 2 - box / 6};
+        SDL_RenderFillRect(render, &topRect);
+        totaleLeft--;
+    }
+    for (int i = 0; i < GameTimer.h * 2; i++)
+    {
+        if (totaleLeft < 0)
+        {
+            SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
+        }
+        SDL_Rect topRect = {0 + (box / 16), ((i * (box / 2)) + box / 2) + (box / 12), box / 2 - box / 6, box / 2 - box / 6};
+        SDL_RenderFillRect(render, &topRect);
+        totaleLeft--;
+    }
+    for (int i = 0; i < GameTimer.w * 2; i++)
+    {
+        if (totaleLeft > 0)
+        {
+            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
+        }
+        SDL_Rect topRect = {((i * (box / 2)) + box / 2) + (box / 12), (box * (HIEGHT - 1)) + (box / 2) + (box / 16), box / 2 - box / 6, box / 2 - box / 6};
+        SDL_RenderFillRect(render, &topRect);
+        totaleLeft--;
+    }
+    for (int i = GameTimer.h * 2; i > 0; i--)
+    {
+        if (totaleLeft > 0)
+        {
+            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
+        }
+        SDL_Rect topRect = {(box * (WIDTH - 1)) + (box / 2) + (box / 16), ((i * (box / 2)) + box / 2) - (box / 2) + (box / 12), box / 2 - box / 6, box / 2 - box / 6};
+        SDL_RenderFillRect(render, &topRect);
+        totaleLeft--;
+    }
+    for (int i = 6; i >= 0; i--)
+    {
+        if (totaleLeft > 0)
+        {
+            SDL_SetRenderDrawColor(render, 223, 243, 208, 255); // Dark gray color
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
+        }
+        SDL_Rect topRect = {((5 * box + (box / 2)) + (i * (box / 2)) + box / 2) + (box / 12), 0 + (box / 16), box / 2 - box / 6, box / 2 - box / 6};
+        SDL_RenderFillRect(render, &topRect);
+        totaleLeft--;
+    }
+}
+
+void GameTimeClock()
+{
+    printf("\n\n ==> %d", totaleTime);
+    if (totaleTime < 0)
+    {
+        GameTimer.Totale -= GameTimer.dec;
+        totaleTime = GameTimer.time * 500;
+    }
+    else
+    {
+        totaleTime -= Frame;
     }
 }
 
@@ -136,8 +241,6 @@ void makeTimer()
 
 int main(int argc, char **argv)
 {
-    // Set UP
-    // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
         fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
@@ -148,20 +251,17 @@ int main(int argc, char **argv)
     if (window == NULL)
     {
         fprintf(stderr, "Window could not be created! SDL_Error: %s\n", SDL_GetError());
-        getc(stdin);
         return 1;
     }
     render = SDL_CreateRenderer(window, -1, 0);
     if (window == NULL)
     {
         fprintf(stderr, "Window could not be created! SDL_Error: %s\n", SDL_GetError());
-        getc(stdin);
         return 1;
     }
-    GameTimer.w = WIDTH - 1;
-    GameTimer.h = HIEGHT - 1;
-    GameTimer.Totale = GameTimer.w * 2 - 4 + GameTimer.h * 2;
-    GameTimer.dec = 1;
+    // Set UP
+    // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    SetUp();
     // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
     // Game Loop
@@ -171,7 +271,7 @@ int main(int argc, char **argv)
         HandelEvents();
         Update();
         RenderGame();
-        SDL_Delay(20);
+        SDL_Delay(Frame);
     }
     // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
