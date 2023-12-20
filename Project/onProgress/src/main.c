@@ -12,11 +12,11 @@ typedef struct
 typedef struct
 {
     int Totale, dec;
+    int h, w;
 } Timer;
 
 // Public variables to make acces more easier
-int box = 48;
-int WIDTH;
+int box = 48, HIEGHT = 9, WIDTH = 10;
 bool playing = true;
 SDL_Window *window;
 SDL_Renderer *render;
@@ -71,7 +71,7 @@ void HandelEvents()
 void makeGread()
 {
     SDL_RenderClear(render);
-    SDL_Surface *surface = SDL_LoadBMP("../src/sonic.bmp");
+    SDL_Surface *surface = SDL_LoadBMP("../src/grid.bmp");
     if (!surface)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load BMP image: %s", SDL_GetError());
@@ -86,7 +86,7 @@ void makeGread()
         EndGame();
         return;
     }
-    SDL_Rect destinationRect = {box / 2, box / 2, box * 9, box * 9};
+    SDL_Rect destinationRect = {box / 2, box / 2, box * (WIDTH - 1), box * (HIEGHT - 1)};
     SDL_RenderCopy(render, texture, NULL, &destinationRect);
 
     for (int i = 0; i < 2; i++)
@@ -94,14 +94,14 @@ void makeGread()
         for (int j = 0; j < 2; j++)
         {
             SDL_SetRenderDrawColor(render, 255, 255, 255, 255); // White color
-            SDL_Rect topRect = {(i * (box * 10 - (box / 2))),(j * (box * 10 - (box / 2))) , box / 2, box / 2};
+            SDL_Rect topRect = {(i * (WIDTH * box - (box / 2))), (j * (box * HIEGHT - (box / 2))), box / 2, box / 2};
             SDL_RenderFillRect(render, &topRect);
         }
     }
 }
 
-void makeTimer(){
-    
+void makeTimer()
+{
 }
 
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -110,14 +110,13 @@ int main(int argc, char **argv)
 {
     // Set UP
     // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    WIDTH = box * 10;
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
         fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         getc(stdin);
         return 1;
     }
-    window = SDL_CreateWindow("Simple Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, WIDTH, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Simple Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, box * WIDTH, HIEGHT * box, SDL_WINDOW_SHOWN);
     if (window == NULL)
     {
         fprintf(stderr, "Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -131,6 +130,10 @@ int main(int argc, char **argv)
         getc(stdin);
         return 1;
     }
+    GameTimer.w = WIDTH - 1;
+    GameTimer.h = HIEGHT - 1;
+    GameTimer.Totale = GameTimer.w * 2 - 4 + GameTimer.h * 2;
+    GameTimer.dec = 1;
     // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
     // Game Loop
