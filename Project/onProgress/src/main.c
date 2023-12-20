@@ -68,9 +68,9 @@ void SetUp()
     // set class of the timer game
     GameTimer.w = WIDTH - 1;
     GameTimer.h = HIEGHT - 1;
-    GameTimer.Totale = (GameTimer.w * 2 + GameTimer.h * 2) * 2 - 1;
+    GameTimer.Totale = (GameTimer.w * 2 + GameTimer.h * 2) * 2 - 4;
     GameTimer.dec = 1;
-    GameTimer.time = 0.3;
+    GameTimer.time = 1;
 
     // set timer for decresing
     totaleTime = GameTimer.time * 500;
@@ -158,6 +158,7 @@ void makeGread()
 
 void makeTimer()
 {
+    SDL_RenderClear(render);
     for (int i = 1; i >= 0; i--)
     {
         if (i >= GameTimer.dec)
@@ -171,7 +172,8 @@ void makeTimer()
         SDL_Rect topRect = {(i * box) + box * 4, 0, box, box / 2};
         SDL_RenderFillRect(render, &topRect);
     }
-    int totaleLeft = GameTimer.Totale - 3;
+    int totaleLeft = GameTimer.Totale - 4;
+    printf("\n\t===> tail : %d", GameTimer.Totale);
     if (totaleLeft < ((2 * 64) / 3))
     {
         indexTimerColor = 1;
