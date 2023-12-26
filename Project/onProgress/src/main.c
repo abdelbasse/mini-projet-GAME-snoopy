@@ -67,6 +67,9 @@ void RenderMap();
 void GameTimeClock();
 
 void drowPlayer();
+void drowSubPlayer();
+
+void movePlayer(float speed);
 
 void SetUp()
 {
@@ -91,6 +94,8 @@ void SetUp()
     blockMap.pos[2].y = 7;
     blockMap.pos[3].x = 6;
     blockMap.pos[3].y = 3;
+
+    SetPlayerPositionTo(2, 6);
 }
 
 void RenderGame()
@@ -104,7 +109,6 @@ void RenderGame()
 void Update()
 {
     GameTimeClock();
-    SetPlayerPositionTo(2, 6);
 }
 
 void HandelEvents()
@@ -120,6 +124,23 @@ void HandelEvents()
         {
             if (event.key.keysym.sym == SDLK_LEFT)
             {
+                SetPlayerPositionTo(GetPlayerPosition().x - 1, GetPlayerPosition().y);
+                printf("left");
+            }
+            else if (event.key.keysym.sym == SDLK_RIGHT)
+            {
+                SetPlayerPositionTo(GetPlayerPosition().x + 1, GetPlayerPosition().y);
+                printf("right");
+            }
+            else if (event.key.keysym.sym == SDLK_UP)
+            {
+                SetPlayerPositionTo(GetPlayerPosition().x, GetPlayerPosition().y - 1);
+                printf("up");
+            }
+            else if (event.key.keysym.sym == SDLK_DOWN)
+            {
+                SetPlayerPositionTo(GetPlayerPosition().x, GetPlayerPosition().y + 1);
+                printf("down");
             }
         }
     }
@@ -168,7 +189,6 @@ void drowPlayer()
     SDL_SetRenderDrawColor(render, 255, 0, 255, 255); // White color
     SDL_Rect topRect = {Snoppy.pos.x, Snoppy.pos.y, box, box};
     SDL_RenderFillRect(render, &topRect);
-    printf("\nhello Player position is : ( x: %d , y: %d ) Real data is   ( x: %d , y: %d )", GetPlayerPosition().x, GetPlayerPosition().y, Snoppy.pos.x, Snoppy.pos.y);
 }
 
 void makeTimer()
