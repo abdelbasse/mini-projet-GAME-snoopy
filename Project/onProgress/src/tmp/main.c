@@ -2,33 +2,10 @@
 #include "SDL.h"
 #include <stdbool.h>
 
-#define FPS 30
-#define FRAME_TARGET_TIME (1000 / FPS)
-#define MAP_WIDTH 432
-#define MAP_HEIGHT 384
-#define BOX 48
-#define TIMER_WIDTH BOX / 2
-
-int last_frame_time = 0;
-int HIEGHT = 9, WIDTH = 10;
-bool playing = true;
-int Frame = 15;
-int timerColor[3][3] = {{223, 243, 208}, {255, 246, 90}, {255, 97, 61}};
-int indexTimerColor = 0;
-
 typedef struct
 {
     int x, y;
 } Position;
-
-struct game_object
-{
-    Position pos;
-    float width;
-    float height;
-    float vel_x;
-    float vel_y;
-} ball;
 
 typedef struct
 {
@@ -50,10 +27,16 @@ typedef struct
     int nbr;
 } BlockPositions;
 
+// Public variables to make acces more easier
+int box = 48, HIEGHT = 9, WIDTH = 10;
+bool playing = true;
+int Frame = 15;
+int timerColor[3][3] = {{223, 243, 208}, {255, 246, 90}, {255, 97, 61}};
+int indexTimerColor = 0;
+
 SDL_Window *window;
 SDL_Renderer *render;
-Player Snoppy, S_animated;
-
+Player Snoppy;
 Timer GameTimer;
 BlockPositions blockMap;
 
@@ -64,11 +47,6 @@ int totaleTime;
 
 Position GetPlayerPosition();
 void SetPlayerPositionTo(int, int);
-
-int IndexToRealPos(int index)
-{
-    return index * BOX + BOX / 2;
-}
 
 // Main Function
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -89,6 +67,9 @@ void RenderMap();
 void GameTimeClock();
 
 void drowPlayer();
+void drowSubPlayer();
+
+void movePlayer(float speed);
 
 void SetUp()
 {
@@ -105,56 +86,29 @@ void SetUp()
     // Tmp Position of Grides
     blockMap.pos = (Position *)calloc(4, sizeof(Position));
     blockMap.nbr = 4;
-    blockMap.pos[0].x = 0;
-    blockMap.pos[0].y = 6;
+    blockMap.pos[0].x = 1;
+    blockMap.pos[0].y = 0;
     blockMap.pos[1].x = 8;
-    blockMap.pos[1].y = 2;
+    blockMap.pos[1].y = 3;
     blockMap.pos[2].x = 3;
-    blockMap.pos[2].y = 2;
-    blockMap.pos[3].x = 1;
+    blockMap.pos[2].y = 7;
+    blockMap.pos[3].x = 6;
     blockMap.pos[3].y = 3;
 
-    ball.pos.x = MAP_WIDTH / 2;
-    ball.pos.y = MAP_HEIGHT / 2;
-    ball.width = 24;
-    ball.height = 24;
-    ball.vel_x = 180;
-    ball.vel_y = 140;
-    SetPlayerPositionTo(0, 0);
-    S_animated.pos.x = Snoppy.pos.x;
-    S_animated.pos.y = Snoppy.pos.y;
+    SetPlayerPositionTo(2, 6);
 }
 
-void drawBall()
+void RenderGame()
 {
-    SDL_Rect ball_rect = {
-        (int)ball.pos.x,
-        (int)ball.pos.y,
-        (int)ball.width,
-        (int)ball.height};
-    SDL_RenderFillRect(render, &ball_rect);
+    SDL_RenderClear(render);
+    SDL_SetRenderDrawColor(render, 0, 23, 27, 255);
+    makeGread();
+    SDL_RenderPresent(render);
 }
 
-// ...
-Position GetPlayerPosition()
+void Update()
 {
-    Position var;
-    var.x = (int)(Snoppy.pos.x - 24) / (BOX);
-    var.y = (int)(Snoppy.pos.y - 24) / (BOX);
-    return var;
-}
-// function that take the curent index of player and add the nextX & nextY
-void SetPlayerPositionTo(int nextX, int nextY)
-{
-    if (nextX >= 0 && nextX < WIDTH - 1 && nextY >= 0 && nextY < HIEGHT - 1)
-    {
-        Snoppy.pos.x = nextX * BOX + (TIMER_WIDTH);
-        Snoppy.pos.y = nextY * BOX + (TIMER_WIDTH);
-    }
-    else
-    {
-        printf("Can't do a position out of the matrix");
-    }
+    GameTimeClock();
 }
 
 void HandelEvents()
@@ -164,28 +118,35 @@ void HandelEvents()
     {
         if (event.type == SDL_QUIT)
         {
+            playing = false;
             EndGame();
         }
         if (event.type == SDL_KEYDOWN)
         {
-            switch (event.key.keysym.sym)
+            if (event.key.keysym.sym == SDLK_LEFT)
             {
-            case SDLK_LEFT:
                 SetPlayerPositionTo(GetPlayerPosition().x - 1, GetPlayerPosition().y);
-                break;
-            case SDLK_RIGHT:
+                printf("left");
+            }
+            else if (event.key.keysym.sym == SDLK_RIGHT)
+            {
                 SetPlayerPositionTo(GetPlayerPosition().x + 1, GetPlayerPosition().y);
-                break;
-            case SDLK_UP:
+                printf("right");
+            }
+            else if (event.key.keysym.sym == SDLK_UP)
+            {
                 SetPlayerPositionTo(GetPlayerPosition().x, GetPlayerPosition().y - 1);
-                break;
-            case SDLK_DOWN:
+                printf("up");
+            }
+            else if (event.key.keysym.sym == SDLK_DOWN)
+            {
                 SetPlayerPositionTo(GetPlayerPosition().x, GetPlayerPosition().y + 1);
-                break;
+                printf("down");
             }
         }
     }
 }
+// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 // Game Extra function
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -207,7 +168,7 @@ void makeGread()
         EndGame();
         return;
     }
-    SDL_Rect destinationRect = {TIMER_WIDTH, TIMER_WIDTH, BOX * (WIDTH - 1), BOX * (HIEGHT - 1)};
+    SDL_Rect destinationRect = {box / 2, box / 2, box * (WIDTH - 1), box * (HIEGHT - 1)};
     SDL_RenderCopy(render, texture, NULL, &destinationRect);
 
     for (int i = 0; i < 2; i++)
@@ -215,7 +176,7 @@ void makeGread()
         for (int j = 0; j < 2; j++)
         {
             SDL_SetRenderDrawColor(render, 255, 255, 255, 255); // White color
-            SDL_Rect topRect = {(i * (WIDTH * BOX - (TIMER_WIDTH))), (j * (BOX * HIEGHT - (TIMER_WIDTH))), TIMER_WIDTH, TIMER_WIDTH};
+            SDL_Rect topRect = {(i * (WIDTH * box - (box / 2))), (j * (box * HIEGHT - (box / 2))), box / 2, box / 2};
             SDL_RenderFillRect(render, &topRect);
         }
     }
@@ -227,7 +188,7 @@ void makeGread()
 void drowPlayer()
 {
     SDL_SetRenderDrawColor(render, 255, 0, 255, 255); // White color
-    SDL_Rect topRect = {Snoppy.pos.x, Snoppy.pos.y, BOX, BOX};
+    SDL_Rect topRect = {Snoppy.pos.x, Snoppy.pos.y, box, box};
     SDL_RenderFillRect(render, &topRect);
 }
 
@@ -243,7 +204,7 @@ void makeTimer()
         {
             SDL_SetRenderDrawColor(render, 200, 200, 200, 255); // Light gray color
         }
-        SDL_Rect topRect = {(i * BOX) + BOX * 4, 0, BOX, TIMER_WIDTH};
+        SDL_Rect topRect = {(i * box) + box * 4, 0, box, box / 2};
         SDL_RenderFillRect(render, &topRect);
     }
     int totaleLeft = GameTimer.Totale;
@@ -265,7 +226,7 @@ void makeTimer()
         {
             SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
         }
-        SDL_Rect topRect = {((i * (TIMER_WIDTH)) + TIMER_WIDTH) + (BOX / 12), 0 + (BOX / 16), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
+        SDL_Rect topRect = {((i * (box / 2)) + box / 2) + (box / 12), 0 + (box / 16), box / 2 - box / 6, box / 2 - box / 6};
         SDL_RenderFillRect(render, &topRect);
         totaleLeft--;
     }
@@ -279,7 +240,7 @@ void makeTimer()
         {
             SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
         }
-        SDL_Rect topRect = {0 + (BOX / 16), ((i * (TIMER_WIDTH)) + TIMER_WIDTH) + (BOX / 12), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
+        SDL_Rect topRect = {0 + (box / 16), ((i * (box / 2)) + box / 2) + (box / 12), box / 2 - box / 6, box / 2 - box / 6};
         SDL_RenderFillRect(render, &topRect);
         totaleLeft--;
     }
@@ -293,7 +254,7 @@ void makeTimer()
         {
             SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
         }
-        SDL_Rect topRect = {((i * (TIMER_WIDTH)) + TIMER_WIDTH) + (BOX / 12), (BOX * (HIEGHT - 1)) + (TIMER_WIDTH) + (BOX / 16), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
+        SDL_Rect topRect = {((i * (box / 2)) + box / 2) + (box / 12), (box * (HIEGHT - 1)) + (box / 2) + (box / 16), box / 2 - box / 6, box / 2 - box / 6};
         SDL_RenderFillRect(render, &topRect);
         totaleLeft--;
     }
@@ -307,7 +268,7 @@ void makeTimer()
         {
             SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
         }
-        SDL_Rect topRect = {(BOX * (WIDTH - 1)) + (TIMER_WIDTH) + (BOX / 16), ((i * (TIMER_WIDTH)) + TIMER_WIDTH) - (TIMER_WIDTH) + (BOX / 12), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
+        SDL_Rect topRect = {(box * (WIDTH - 1)) + (box / 2) + (box / 16), ((i * (box / 2)) + box / 2) - (box / 2) + (box / 12), box / 2 - box / 6, box / 2 - box / 6};
         SDL_RenderFillRect(render, &topRect);
         totaleLeft--;
     }
@@ -321,7 +282,7 @@ void makeTimer()
         {
             SDL_SetRenderDrawColor(render, 52, 98, 88, 255); // Light gray color
         }
-        SDL_Rect topRect = {((5 * BOX + (TIMER_WIDTH)) + (i * (TIMER_WIDTH)) + TIMER_WIDTH) + (BOX / 12), 0 + (BOX / 16), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
+        SDL_Rect topRect = {((5 * box + (box / 2)) + (i * (box / 2)) + box / 2) + (box / 12), 0 + (box / 16), box / 2 - box / 6, box / 2 - box / 6};
         SDL_RenderFillRect(render, &topRect);
         totaleLeft--;
     }
@@ -340,79 +301,7 @@ void GameTimeClock()
     }
 }
 
-void ballCollession()
-{
-    float delta_time = (SDL_GetTicks() - last_frame_time) / 1000.0;
-    last_frame_time = SDL_GetTicks();
-    ball.pos.x += ball.vel_x * delta_time;
-    ball.pos.y += ball.vel_y * delta_time;
-
-    for (int i = 0; i < blockMap.nbr; i++)
-    {
-        bool collisionX = ball.pos.x <= (IndexToRealPos(blockMap.pos[i].x) + BOX) && (ball.pos.x + ball.width) >= IndexToRealPos(blockMap.pos[i].x);
-        bool collisionY = ball.pos.y <= (IndexToRealPos(blockMap.pos[i].y) + BOX) && (ball.pos.y + ball.height) >= IndexToRealPos(blockMap.pos[i].y);
-        if (collisionY && collisionX)
-        {
-            int theColideSideX = (ball.pos.x + ball.width / 2) - (IndexToRealPos(blockMap.pos[i].x) + BOX / 2);
-            int theColideSideY = (ball.pos.y + ball.height / 2) - (IndexToRealPos(blockMap.pos[i].y) + BOX / 2);
-
-            printf("\n\t ==> %d \t ==> %d ", theColideSideX, theColideSideY);
-            if (abs(theColideSideX) > abs(theColideSideY))
-            {
-                // First Collision on
-                if (theColideSideY > 0)
-                {
-                    // BOTTOM
-                    ball.vel_y += (IndexToRealPos(blockMap.pos[i].y) + BOX) - (ball.pos.y);
-                }
-                else
-                {
-                    // TOP
-                    ball.vel_y -= (ball.pos.y + ball.height) - IndexToRealPos(blockMap.pos[i].y);
-                }
-                ball.vel_x = -ball.vel_x;
-            }
-            else
-            {
-                // First Collision on
-                if (theColideSideX > 0)
-                {
-                    // RIGHT
-                    ball.vel_x += (IndexToRealPos(blockMap.pos[i].x) + BOX) - (ball.pos.x);
-                }
-                else
-                {
-                    // LEFT
-                    ball.vel_x -= (ball.pos.x + ball.height) - IndexToRealPos(blockMap.pos[i].x);
-                }
-                ball.vel_y = -ball.vel_y;
-            }
-        }
-    }
-
-    if (ball.pos.x < TIMER_WIDTH)
-    {
-        ball.pos.x = TIMER_WIDTH;
-        ball.vel_x = -ball.vel_x;
-    }
-    if (ball.pos.x + ball.height > MAP_WIDTH + TIMER_WIDTH)
-    {
-        ball.pos.x = MAP_WIDTH + TIMER_WIDTH - ball.width;
-        ball.vel_x = -ball.vel_x;
-    }
-    if (ball.pos.y < TIMER_WIDTH)
-    {
-        ball.pos.y = TIMER_WIDTH;
-        ball.vel_y = -ball.vel_y;
-    }
-    if (ball.pos.y + ball.height > MAP_WIDTH - TIMER_WIDTH)
-    {
-        ball.pos.y = MAP_WIDTH - TIMER_WIDTH - ball.height;
-        ball.vel_y = -ball.vel_y;
-    }
-}
-
-// Render the BOX depending on the index x,y (0 to 8 for X ----- 0 to 7 for Y)
+// Render the box depending on the index x,y (0 to 8 for X ----- 0 to 7 for Y)
 void RenderMap()
 {
     for (int i = 0; i < blockMap.nbr; i++)
@@ -432,27 +321,36 @@ void RenderMap()
             EndGame();
             return;
         }
-        SDL_Rect destinationRect = {(blockMap.pos[i].x * BOX) + TIMER_WIDTH, (blockMap.pos[i].y * BOX) + TIMER_WIDTH, BOX, BOX};
+        SDL_Rect destinationRect = {(blockMap.pos[i].x * box) + box / 2, (blockMap.pos[i].y * box) + box / 2, box, box};
         SDL_RenderCopy(render, texture, NULL, &destinationRect);
     }
 }
+
+Position GetPlayerPosition()
+{
+    Position var;
+    var.x = (int)(Snoppy.pos.x - 24) / (box);
+    var.y = (int)(Snoppy.pos.y - 24) / (box);
+    return var;
+}
+// function that take the curent index of player and add the nextX & nextY
+void SetPlayerPositionTo(int nextX, int nextY)
+{
+    // Code that chnage the icon of player depeding on the direction using(.lastDirection in  structer)
+    //
+    //  code Chnage the x and y
+    if (nextX >= 0 && nextX < WIDTH && nextY >= 0 && nextY < HIEGHT)
+    {
+        Snoppy.pos.x = nextX * box + (box / 2);
+        Snoppy.pos.y = nextY * box + (box / 2);
+    }
+    else
+    {
+        printf("Can't do a position out of the matrics");
+    }
+}
+
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-void RenderGame()
-{
-    SDL_RenderClear(render);
-    SDL_SetRenderDrawColor(render, 0, 23, 27, 255);
-    makeGread();
-    drawBall();
-    SDL_RenderPresent(render);
-}
-
-void Update()
-{
-    HandelEvents();
-    GameTimeClock();
-    ballCollession();
-}
-
 int main(int argc, char **argv)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -461,7 +359,7 @@ int main(int argc, char **argv)
         getc(stdin);
         return 1;
     }
-    window = SDL_CreateWindow("Simple Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, BOX * WIDTH, HIEGHT * BOX, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Simple Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, box * WIDTH, HIEGHT * box, SDL_WINDOW_SHOWN);
     if (window == NULL)
     {
         fprintf(stderr, "Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -483,9 +381,10 @@ int main(int argc, char **argv)
 
     while (playing)
     {
+        HandelEvents();
         Update();
         RenderGame();
-        SDL_Delay(FPS);
+        SDL_Delay(Frame);
     }
     // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
