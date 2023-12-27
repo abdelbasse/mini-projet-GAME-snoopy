@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "SDL.h"
 #include <stdbool.h>
 
@@ -267,7 +268,10 @@ void makeTimer()
         }
         SDL_Rect topRect = {((i * (TIMER_WIDTH)) + TIMER_WIDTH) + (BOX / 12), 0 + (BOX / 16), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
         SDL_RenderFillRect(render, &topRect);
-        totaleLeft--;
+        if (totaleLeft >= 0)
+        {
+            totaleLeft--;
+        }
     }
     for (int i = 0; i < GameTimer.h * 2; i++)
     {
@@ -281,7 +285,10 @@ void makeTimer()
         }
         SDL_Rect topRect = {0 + (BOX / 16), ((i * (TIMER_WIDTH)) + TIMER_WIDTH) + (BOX / 12), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
         SDL_RenderFillRect(render, &topRect);
-        totaleLeft--;
+        if (totaleLeft >= 0)
+        {
+            totaleLeft--;
+        }
     }
     for (int i = 0; i < GameTimer.w * 2; i++)
     {
@@ -295,7 +302,10 @@ void makeTimer()
         }
         SDL_Rect topRect = {((i * (TIMER_WIDTH)) + TIMER_WIDTH) + (BOX / 12), (BOX * (HIEGHT - 1)) + (TIMER_WIDTH) + (BOX / 16), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
         SDL_RenderFillRect(render, &topRect);
-        totaleLeft--;
+        if (totaleLeft >= 0)
+        {
+            totaleLeft--;
+        }
     }
     for (int i = GameTimer.h * 2; i > 0; i--)
     {
@@ -309,7 +319,10 @@ void makeTimer()
         }
         SDL_Rect topRect = {(BOX * (WIDTH - 1)) + (TIMER_WIDTH) + (BOX / 16), ((i * (TIMER_WIDTH)) + TIMER_WIDTH) - (TIMER_WIDTH) + (BOX / 12), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
         SDL_RenderFillRect(render, &topRect);
-        totaleLeft--;
+        if (totaleLeft >= 0)
+        {
+            totaleLeft--;
+        }
     }
     for (int i = 6; i >= 0; i--)
     {
@@ -323,7 +336,10 @@ void makeTimer()
         }
         SDL_Rect topRect = {((5 * BOX + (TIMER_WIDTH)) + (i * (TIMER_WIDTH)) + TIMER_WIDTH) + (BOX / 12), 0 + (BOX / 16), TIMER_WIDTH - BOX / 6, TIMER_WIDTH - BOX / 6};
         SDL_RenderFillRect(render, &topRect);
-        totaleLeft--;
+        if (totaleLeft >= 0)
+        {
+            totaleLeft--;
+        }
     }
 }
 
@@ -340,52 +356,32 @@ void GameTimeClock()
     }
 }
 
-void ballCollession()
+void ballCollision()
 {
     float delta_time = (SDL_GetTicks() - last_frame_time) / 1000.0;
     last_frame_time = SDL_GetTicks();
+
     ball.pos.x += ball.vel_x * delta_time;
     ball.pos.y += ball.vel_y * delta_time;
 
     for (int i = 0; i < blockMap.nbr; i++)
     {
-        bool collisionX = ball.pos.x <= (IndexToRealPos(blockMap.pos[i].x) + BOX) && (ball.pos.x + ball.width) >= IndexToRealPos(blockMap.pos[i].x);
-        bool collisionY = ball.pos.y <= (IndexToRealPos(blockMap.pos[i].y) + BOX) && (ball.pos.y + ball.height) >= IndexToRealPos(blockMap.pos[i].y);
-        if (collisionY && collisionX)
-        {
-            int theColideSideX = (ball.pos.x + ball.width / 2) - (IndexToRealPos(blockMap.pos[i].x) + BOX / 2);
-            int theColideSideY = (ball.pos.y + ball.height / 2) - (IndexToRealPos(blockMap.pos[i].y) + BOX / 2);
+        float boxRight = IndexToRealPos(blockMap.pos[i].x) + BOX;
+        float boxBottom = IndexToRealPos(blockMap.pos[i].y) + BOX;
 
-            printf("\n\t ==> %d \t ==> %d ", theColideSideX, theColideSideY);
-            if (abs(theColideSideX) > abs(theColideSideY))
+        if (ball.pos.x < boxRight && ball.pos.x + ball.width > IndexToRealPos(blockMap.pos[i].x) && ball.pos.y < boxBottom && ball.pos.y + ball.height > IndexToRealPos(blockMap.pos[i].y))
+        {
+            float overlapX = fmin(fabs(ball.pos.x + ball.width - IndexToRealPos(blockMap.pos[i].x)), fabs(IndexToRealPos(blockMap.pos[i].x) + BOX - ball.pos.x));
+            float overlapY = fmin(fabs(ball.pos.y + ball.height - IndexToRealPos(blockMap.pos[i].y)), fabs(IndexToRealPos(blockMap.pos[i].y) + BOX - ball.pos.y));
+            if (overlapX > overlapY)
             {
-                // First Collision on
-                if (theColideSideY > 0)
-                {
-                    // BOTTOM
-                    ball.vel_y += (IndexToRealPos(blockMap.pos[i].y) + BOX) - (ball.pos.y);
-                }
-                else
-                {
-                    // TOP
-                    ball.vel_y -= (ball.pos.y + ball.height) - IndexToRealPos(blockMap.pos[i].y);
-                }
-                ball.vel_x = -ball.vel_x;
+                ball.pos.y = (ball.vel_y > 0) ? (IndexToRealPos(blockMap.pos[i].y) - ball.height) : (IndexToRealPos(blockMap.pos[i].y) + BOX);
+                ball.vel_y = -ball.vel_y;
             }
             else
             {
-                // First Collision on
-                if (theColideSideX > 0)
-                {
-                    // RIGHT
-                    ball.vel_x += (IndexToRealPos(blockMap.pos[i].x) + BOX) - (ball.pos.x);
-                }
-                else
-                {
-                    // LEFT
-                    ball.vel_x -= (ball.pos.x + ball.height) - IndexToRealPos(blockMap.pos[i].x);
-                }
-                ball.vel_y = -ball.vel_y;
+                ball.pos.x = (ball.vel_x > 0) ? (IndexToRealPos(blockMap.pos[i].x) - ball.width) : (IndexToRealPos(blockMap.pos[i].x) + BOX);
+                ball.vel_x = -ball.vel_x;
             }
         }
     }
@@ -450,7 +446,7 @@ void Update()
 {
     HandelEvents();
     GameTimeClock();
-    ballCollession();
+    ballCollision();
 }
 
 int main(int argc, char **argv)
