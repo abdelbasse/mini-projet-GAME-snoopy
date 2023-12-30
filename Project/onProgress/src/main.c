@@ -42,7 +42,7 @@ typedef struct
 {
     Position pos;
     int width, height, frameWidth, frameHeight, rows, cols;
-    int currentFrame;
+    int currentFrame, startPosition;
     float TimePerFrame;
     float curentTimeLeft;
     SDL_Surface *surface;
@@ -95,6 +95,7 @@ SDL_Surface *playerLeftSurface;
 SDL_Surface *playerRightSurface;
 // Add ActionSurface (the cursore allow user for selection options)
 SDL_Surface *ActionSurface;
+SDL_Surface *Menusurface;
 
 // Declare player texture variables globally
 SDL_Texture *playerUpTexture;
@@ -103,6 +104,7 @@ SDL_Texture *playerLeftTexture;
 SDL_Texture *playerRightTexture;
 // Add ActionTexture (the cursore allow user for selection options)
 SDL_Texture *ActionTexture;
+SDL_Texture *Menutexture;
 
 // Player structure Levels Variable so we can use it
 Levels PlayerLevels;
@@ -243,6 +245,7 @@ void SetUp()
     playerLeftSurface = SDL_LoadBMP("../src/Snoppy/Snoppy-left.bmp");
     playerRightSurface = SDL_LoadBMP("../src/Snoppy/Snoppy-right.bmp");
     ActionSurface = SDL_LoadBMP("../src/actionPointer.bmp");
+    Menusurface = SDL_LoadBMP("../src/menuHomeBG.bmp");
 
     // Smoppy show in the menu
     SnoopyMain.frameWidth = 287;
@@ -252,8 +255,9 @@ void SetUp()
     SnoopyMain.rows = 1;
     SnoopyMain.cols = 3;
     SnoopyMain.currentFrame = 2;
-    SnoopyMain.TimePerFrame = 90;
+    SnoopyMain.TimePerFrame = 140;
     SnoopyMain.pos.x = BOX * 10;
+    SnoopyMain.startPosition = BOX * 10;
     SnoopyMain.pos.y = BOX * 5 - SnoopyMain.height;
     SnoopyMain.curentTimeLeft = SnoopyMain.TimePerFrame;
     SnoopyMain.surface = SDL_LoadBMP("../src/Snoppy/SnoopyMenu.bmp");
@@ -266,14 +270,15 @@ void SetUp()
     BadSnoppyMain.rows = 1;
     BadSnoppyMain.cols = 3;
     BadSnoppyMain.currentFrame = 1;
-    BadSnoppyMain.TimePerFrame = 85;
+    BadSnoppyMain.TimePerFrame = 140;
     BadSnoppyMain.pos.x = BOX * 12;
+    BadSnoppyMain.startPosition = BOX * 12;
     BadSnoppyMain.pos.y = BOX * 5 - BadSnoppyMain.height;
     BadSnoppyMain.curentTimeLeft = BadSnoppyMain.TimePerFrame;
     BadSnoppyMain.surface = SDL_LoadBMP("../src/Snoppy/BadSnoppyMenu.bmp");
 
     // Check if loading player images was successful
-    if (!playerUpSurface || !playerDownSurface || !playerLeftSurface || !playerRightSurface || !ActionSurface)
+    if (!playerUpSurface || !playerDownSurface || !playerLeftSurface || !playerRightSurface || !ActionSurface || !Menusurface)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load player images: %s", SDL_GetError());
         EndGame();
@@ -288,9 +293,9 @@ void SetUp()
     ActionTexture = SDL_CreateTextureFromSurface(render, ActionSurface);
     SnoopyMain.texture = SDL_CreateTextureFromSurface(render, SnoopyMain.surface);
     BadSnoppyMain.texture = SDL_CreateTextureFromSurface(render, BadSnoppyMain.surface);
-
+    Menutexture = SDL_CreateTextureFromSurface(render,Menusurface);
     // Check if creating player textures was successful
-    if (!playerUpTexture || !playerDownTexture || !playerLeftTexture || !playerRightTexture || !ActionTexture)
+    if (!playerUpTexture || !playerDownTexture || !playerLeftTexture || !playerRightTexture || !ActionTexture || !Menutexture)
     {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to create player textures: %s", SDL_GetError());
         EndGame();
@@ -305,6 +310,8 @@ void SetUp()
     SDL_FreeSurface(ActionSurface);
     SDL_FreeSurface(SnoopyMain.surface);
     SDL_FreeSurface(BadSnoppyMain.surface);
+    SDL_FreeSurface(Menusurface);
+
     // Initialize GameTimer
     GameTimer.w = WIDTH - 1;
     GameTimer.h = HIEGHT - 1;
@@ -470,10 +477,10 @@ void ballCollision()
         if (ball.pos.x < boxRight && ball.pos.x + ball.width > IndexToRealPos(blockMap.pos[i].x) &&
             ball.pos.y < boxBottom && ball.pos.y + ball.height > IndexToRealPos(blockMap.pos[i].y))
         {
-            float overlapX = fmin(fabs(ball.pos.x + ball.width - IndexToRealPos(blockMap.pos[i].x)),
-                                  fabs(IndexToRealPos(blockMap.pos[i].x) + BOX - ball.pos.x));
-            float overlapY = fmin(fabs(ball.pos.y + ball.height - IndexToRealPos(blockMap.pos[i].y)),
-                                  fabs(IndexToRealPos(blockMap.pos[i].y) + BOX - ball.pos.y));
+            float overlapX = fmin(abs(ball.pos.x + ball.width - IndexToRealPos(blockMap.pos[i].x)),
+                                  abs(IndexToRealPos(blockMap.pos[i].x) + BOX - ball.pos.x));
+            float overlapY = fmin(abs(ball.pos.y + ball.height - IndexToRealPos(blockMap.pos[i].y)),
+                                  abs(IndexToRealPos(blockMap.pos[i].y) + BOX - ball.pos.y));
             if (overlapX > overlapY)
             {
                 ball.pos.y = (ball.vel_y > 0) ? (IndexToRealPos(blockMap.pos[i].y) - ball.height) : (IndexToRealPos(blockMap.pos[i].y) + BOX);
@@ -1016,28 +1023,8 @@ void ListMenuEventsSelect(SDL_Event event)
 
 void makeMenu()
 {
-    // Load grid image
-    SDL_Surface *surface = SDL_LoadBMP("../src/menuHomeBG.bmp");
-    if (!surface)
-    {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load BMP image: %s", SDL_GetError());
-        EndGame();
-        return;
-    }
-
-    // Create texture from surface
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(render, surface);
-    SDL_FreeSurface(surface);
-    if (!texture)
-    {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to create texture from surface: %s", SDL_GetError());
-        EndGame();
-        return;
-    }
-
-    // Render grid texture
     SDL_Rect destinationRect = {0, 0, BOX * (WIDTH), BOX * (HIEGHT)};
-    SDL_RenderCopy(render, texture, NULL, &destinationRect);
+    SDL_RenderCopy(render, Menutexture, NULL, &destinationRect);
 }
 
 void drawSprite(Sprite *sprite)
@@ -1060,11 +1047,11 @@ void SpriteUpdateAnimation(Sprite *sprite)
         (sprite->currentFrame == sprite->cols - 1) ? sprite->currentFrame = 0 : sprite->currentFrame++;
     }
     sprite->curentTimeLeft -= Frame;
-    if (sprite->pos.x <= (-sprite->width * 2))
+    if (sprite->pos.x <= (sprite->startPosition - MAP_WIDTH * 2))
     {
-        sprite->pos.x = BOX * 10 + sprite->width;
+        sprite->pos.x = sprite->startPosition;
     }
-    sprite->pos.x -= 4;
+    sprite->pos.x -= 3;
 }
 
 void RenderLevelsMenu()
