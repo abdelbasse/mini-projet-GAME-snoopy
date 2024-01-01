@@ -1,0 +1,39 @@
+{
+	"levelIndex":	1,
+	"timerBlocksLeft":	62,
+	"berdsCount":	4,
+	"snoopyPosition":	{
+		"x":	3,
+		"y":	4
+	},
+	"ball":	{
+		"x":	5,
+		"y":	2
+	},
+	"blockPositions":	[{
+			"x":	1,
+			"y":	1
+		}, {
+			"x":	1,
+			"y":	6
+		}, {
+			"x":	7,
+			"y":	6
+		}, {
+			"x":	7,
+			"y":	1
+		}],
+	"birdPositions":	[{
+			"x":	0,
+			"y":	0
+		}, {
+			"x":	0,
+			"y":	7
+		}, {
+			"x":	8,
+			"y":	0
+		}, {
+			"x":	8,
+			"y":	7
+		}]
+}
