@@ -244,6 +244,7 @@ void Update();
 // ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 float TimeLeft();
 void gameOverScreen();
+
 int main(int argc, char **argv)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -269,7 +270,7 @@ int main(int argc, char **argv)
     {
         Update();
         RenderGame();
-        SDL_Delay(15);
+        SDL_Delay(Frame);
     }
     EndGame();
     return 0;
@@ -368,6 +369,7 @@ cJSON *loadJSONFromFile(const char *filename)
 
     return root;
 }
+
 void commonInitialize(LevelData *levelData)
 {
     CurrentLevel = levelData->levelIndex;
@@ -432,6 +434,7 @@ void Load(const char *filename)
 
     free(levelData);
 }
+
 void saveLevelDataToFile(const char *filename)
 {
     cJSON *root = cJSON_CreateObject();
@@ -778,11 +781,13 @@ void birdCollision()
         }
     }
 }
+
 void renderCollisionRect(SDL_Rect collisionRect)
 {
     SDL_SetRenderDrawColor(render, 255, 0, 0, 255); // Set color to red (R, G, B, A)
     SDL_RenderFillRect(render, &collisionRect);
 }
+
 void renderBall()
 {
     SDL_SetRenderDrawColor(render, 0, 0, 255, 255); // Set color to blue (R, G, B, A)
@@ -1491,6 +1496,7 @@ void RenderLevelsMenu()
         SDL_DestroyTexture(texture);
     }
 }
+
 void renderWinScreen()
 {
     SDL_Surface *winSurface = SDL_LoadBMP("../src/winScreen.bmp");
@@ -1602,6 +1608,7 @@ void gameOverScreen()
 
     SDL_DestroyTexture(winTexture);
 }
+
 void GamePlayUpdate()
 {
     // printf("birdPositions.count : %d", birdPositions.count);
